@@ -1,4 +1,4 @@
-package main.java.com.example.demo.app;
+package com.example.demo.app;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;

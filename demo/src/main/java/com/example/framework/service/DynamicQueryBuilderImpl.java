@@ -1,5 +1,7 @@
-package main.java.com.example.framework.service;
+package com.example.framework.service;
 
+import com.example.framework.service.DynamicQueryBuilder;
+import com.example.framework.service.DynamicQueryStatementResolver;
 import org.apache.commons.lang3.Validate;
 import org.dom4j.Document;
 import org.dom4j.Element;

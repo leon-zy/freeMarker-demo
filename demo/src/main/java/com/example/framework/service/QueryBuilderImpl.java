@@ -1,4 +1,4 @@
-package main.java.com.example.framework.service;
+package com.example.framework.service;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;

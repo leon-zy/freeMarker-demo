@@ -1,9 +1,9 @@
-package main.java.com.example.demo.app;
+package com.example.demo.app;
+
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.util.Map;
-
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * 动态sql/hql语句组装器

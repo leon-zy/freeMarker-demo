@@ -1,4 +1,4 @@
-package main.java.com.example.framework.service;
+package com.example.framework.service;
 
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;

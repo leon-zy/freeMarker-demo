@@ -1,7 +1,11 @@
-package main.java.com.example.framework.dao;
+package com.example.framework.dao;
 
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
+import com.example.framework.annotation.NamedQueryData;
+import com.example.framework.service.DynamicQueryBuilder;
+import com.example.framework.service.DynamicQueryBuilderImpl;
+import com.example.framework.service.StatementTemplate;
 import com.google.common.collect.Sets;
 import com.insaic.base.dao.jpa.BaseHibernate4Dao;
 import com.insaic.base.exception.BusinessException;
@@ -15,11 +19,7 @@ import com.insaic.common.code.model.PageParamMO;
 import com.insaic.common.constants.CodeMsgConstants;
 import com.insaic.common.util.CommonDataUtils;
 import com.insaic.common.util.QueryPageResultUtils;
-import com.insaic.rescue.annotation.NamedQueryData;
 import com.insaic.rescue.constants.RescueConstants;
-import com.insaic.rescue.framework.DynamicQueryBuilder;
-import com.insaic.rescue.framework.DynamicQueryBuilderImpl;
-import com.insaic.rescue.framework.StatementTemplate;
 import com.insaic.rescue.utils.DataSecretUtils;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;

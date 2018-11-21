@@ -1,14 +1,11 @@
-package main.java.com.example.demo.app;
+package com.example.demo.app;
 
-import java.io.InputStream;
-import java.io.Serializable;
-
-import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
-import org.hibernate.internal.util.ConfigHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+
+import java.io.InputStream;
 
 /**
  * hibernate动态sql dtd解析器

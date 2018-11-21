@@ -1,12 +1,4 @@
-package main.java.com.example.demo.app;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+package com.example.demo.app;
 
 import org.apache.commons.lang.Validate;
 import org.dom4j.Document;
@@ -27,6 +19,14 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 默认的加载器-将指定配置文件中的sql/hql语句加载到内存中
