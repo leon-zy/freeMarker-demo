@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<!DOCTYPE dynamic-hibernate-statement PUBLIC "-//Haier/HOP Hibernate Dynamic Statement DTD 1.0//EN"  
+"http://www.wongws.com/dtd/dynamic-hibernate-statement-1.0.dtd">
+
+<dynamic-hibernate-statement>
+
+	<sql-query name="resource.getUser" mode="normal">  
+    <![CDATA[ 
+     
+       select * from t_user t where t.user_id=${userid}
+         <#if password??> 
+            and t.password=${password} 
+         </#if> 
+    ]]>
+	</sql-query>
+</dynamic-hibernate-statement>  

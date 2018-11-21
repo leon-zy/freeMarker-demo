@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dynamic-query PUBLIC "-//Insaic/HOP Hibernate Dynamic Statement DTD 1.0//EN"
+        "http://www.insaic.com/dtd/dynamic-query-1.0.dtd">
+
+<dynamic-query>
+
+    <sql-query name="orderRescuerInfoArc.findLastArcByInsaicOrderNo">
+        <![CDATA[
+            select a.*
+              from rescueowner.rs_order_rescuer_info_arc a
+             where a.update_version =
+             (select max(c.update_version) from rescueowner.rs_order_rescuer_info_arc c where c.insaic_order_no = a.insaic_order_no)
+             and a.insaic_order_no = :insaicOrderNo
+        ]]>
+    </sql-query>
+
+    <sql-query name="orderAcciInfoArc.findLastArcByInsaicOrderNo">
+        <![CDATA[
+            select a.*
+              from (select c.*
+                      from rescueowner.rs_order_acci_info_arc c
+                     where c.insaic_order_no = :insaicOrderNo
+                     <#if partnerCode?? && partnerCode != ''>
+                        and c.update_partner_code = :partnerCode
+                     </#if>
+                     order by c.update_version desc) a
+               where rownum = 1
+        ]]>
+    </sql-query>
+
+    <sql-query name="orderSettle.loadOrderSettleListByParam">
+        <![CDATA[
+            select ss.insaic_order_no,
+                   ss.amt_type,
+                   ss.amount,
+                   ss.service_type_owner,
+                   ss.finish_time,
+                   o.owner_order_no,
+                   o.owner_sub_order_no
+              from rs_order_settle ss
+             inner join rs_owner_order o
+                on ss.insaic_order_no = o.insaic_order_no
+             where 1 = 1
+             <#if checkBatchNo?? && checkBatchNo != ''>
+                and ss.check_batch_no = :checkBatchNo
+             </#if>
+             <#if partnerCode?? && partnerCode != ''>
+                and ss.partner_code = :partnerCode
+             </#if>
+        ]]>
+    </sql-query>
+
+    <sql-query name="insaicOrder.findInsaicOrderByParamInfo">
+        <![CDATA[
+            select o.*
+              from rescueowner.rs_insaic_order o
+             where 1=1
+            <#if insaicOrderNo?? && insaicOrderNo != ''>
+                and o.insaic_order_no = :insaicOrderNo
+            </#if>
+            <#if ownerCode?? && ownerCode != ''>
+                and o.owner_code = :ownerCode
+            </#if>
+            <#if ownerOrderNo?? && ownerOrderNo != ''>
+                and o.owner_order_no = :ownerOrderNo
+            </#if>
+            <#if providerCode?? && providerCode != ''>
+                and o.provider_code = :providerCode
+            </#if>
+            <#if providerOrderNo?? && providerOrderNo != ''>
+                and o.provider_order_no = :providerOrderNo
+            </#if>
+        ]]>
+    </sql-query>
+
+    <sql-query name="insaicOrder.queryInsaicOrderPageByParam">
+        <![CDATA[
+            select o.id,
+               o.insaic_order_no,
+               ai.vehicle_no,
+               o.create_time,
+               ri.salvation_person_name,
+               o.service_type_insaic,
+               (select m.dic_name from rescueowner.rs_dic_tbl m
+                 where m.category_code = 'service_type'
+                   and m.dic_code = o.service_type_insaic) service_type_insaic_name,
+               o.salvation_status_insaic,
+               (select m.dic_name from rescueowner.rs_dic_tbl m
+                 where m.category_code = 'salvation_status'
+                   and m.dic_code = o.salvation_status_insaic) salvation_status_insaic_name,
+               o.owner_code,
+               (select m.dic_name from rescueowner.rs_dic_tbl m
+                 where m.category_code = 'partner_type'
+                   and m.dic_code = o.owner_code) owner_code_name,
+               o.branch,
+               o.branch_name
+          from rescueowner.rs_insaic_order       o,
+               rescueowner.rs_order_acci_info    ai,
+               rescueowner.rs_order_rescuer_info ri
+         where ai.insaic_order_no = o.insaic_order_no
+           and ri.insaic_order_no(+) = o.insaic_order_no
+           <#if vehicleNo?? && vehicleNo != ''>
+                and ai.vehicle_no = :vehicleNo
+           </#if>
+           <#if ownerCode?? && ownerCode != ''>
+                and o.owner_code = :ownerCode
+           </#if>
+           <#if branch?? && branch != ''>
+                and o.branch = :branch
+           </#if>
+           <#if serviceTypeInsaic?? && serviceTypeInsaic != ''>
+                and o.service_type_insaic = :serviceTypeInsaic
+           </#if>
+           <#if insaicOrderNo?? && insaicOrderNo != ''>
+                and o.insaic_order_no = :insaicOrderNo
+           </#if>
+           <#if orderStatusInsaic?? && orderStatusInsaic != ''>
+                and o.salvation_status_insaic = :orderStatusInsaic
+           </#if>
+           <#if salvationPersonName?? && salvationPersonName != ''>
+                and ri.salvation_person_name(+) = :salvationPersonName
+           </#if>
+           <#if reportStartDate??>
+                and o.create_time >= :reportStartDate
+           </#if>
+           <#if reportEndDate??>
+               and o.create_time <= :reportEndDate
+           </#if>
+           <#if userCode?? && userCode != ''>
+               and o.create_user = :userCode
+           </#if>
+           <#if rescueTimeoutEnum?? && rescueTimeoutEnum != ''>
+               and o.salvation_status_insaic in (:salvationStatusList)
+               <#if timeoutStart?? && timeoutStart != ''>
+                   and to_date(to_char(o.create_time+${timeoutStart}, 'yyyy-mm-dd HH24:MI:SS'), 'yyyy-mm-dd HH24:MI:SS') < sysdate
+               </#if>
+               <#if timeoutEnd?? && timeoutEnd != ''>
+                   and sysdate < to_date(to_char(o.create_time+${timeoutEnd}, 'yyyy-mm-dd HH24:MI:SS'), 'yyyy-mm-dd HH24:MI:SS')
+               </#if>
+           </#if>
+         order by o.create_time, o.id, o.insaic_order_no
+        ]]>
+    </sql-query>
+
+    <sql-query name="insaicOrder.loadTimeoutInsaicOrderNum">
+        <![CDATA[
+        select count(1) timeout_num
+          from rescueowner.rs_insaic_order       o,
+               rescueowner.rs_order_acci_info    ai,
+               rescueowner.rs_order_rescuer_info ri
+         where ai.insaic_order_no = o.insaic_order_no
+           and ri.insaic_order_no(+) = o.insaic_order_no
+           <#if vehicleNo?? && vehicleNo != ''>
+                and ai.vehicle_no = :vehicleNo
+           </#if>
+           <#if ownerCode?? && ownerCode != ''>
+                and o.owner_code = :ownerCode
+           </#if>
+           <#if branch?? && branch != ''>
+                and o.branch = :branch
+           </#if>
+           <#if serviceTypeInsaic?? && serviceTypeInsaic != ''>
+                and o.service_type_insaic = :serviceTypeInsaic
+           </#if>
+           <#if insaicOrderNo?? && insaicOrderNo != ''>
+                and o.insaic_order_no = :insaicOrderNo
+           </#if>
+           <#if orderStatusInsaic?? && orderStatusInsaic != ''>
+                and o.salvation_status_insaic = :orderStatusInsaic
+           </#if>
+           <#if salvationPersonName?? && salvationPersonName != ''>
+                and ri.salvation_person_name(+) = :salvationPersonName
+           </#if>
+           <#if reportStartDate??>
+                and o.create_time >= :reportStartDate
+           </#if>
+           <#if reportEndDate??>
+               and o.create_time <= :reportEndDate
+           </#if>
+           <#if userCode?? && userCode != ''>
+               and o.create_user = :userCode
+           </#if>
+           <#if rescueTimeoutEnum?? && rescueTimeoutEnum != ''>
+               and o.salvation_status_insaic in (:salvationStatusList)
+               <#if timeoutStart?? && timeoutStart != ''>
+                   and to_date(to_char(o.create_time+${timeoutStart}, 'yyyy-mm-dd HH24:MI:SS'), 'yyyy-mm-dd HH24:MI:SS') < sysdate
+               </#if>
+               <#if timeoutEnd?? && timeoutEnd != ''>
+                   and sysdate < to_date(to_char(o.create_time+${timeoutEnd}, 'yyyy-mm-dd HH24:MI:SS'), 'yyyy-mm-dd HH24:MI:SS')
+               </#if>
+           </#if>
+         order by o.create_time, o.id, o.insaic_order_no
+        ]]>
+    </sql-query>
+    <sql-query name="insaicOrder.queryRescueDetails">
+        <![CDATA[
+        select
+           o.insaic_order_no,
+           o.owner_code as insure,
+           o.provider_code,
+           o.service_type_insaic,
+           o.salvation_status_insaic,
+           ow.operator_id,
+           ow.case_cause,
+           ow.service_content,
+           ow.incident_type,
+           ow.service_type_owner,
+           ac.vehicle_no,
+           ac.reporter_name,
+           ac.reporter_phone,
+           ac.case_location,
+           ac.des_address,
+           ac.vehicle_type,
+           ac.vin,
+           ac.insured_name,
+           po.accept_time,
+           nvl(po.act_to_salvation_distance, 0) act_to_salvation_distance,
+           nvl(po.drag_distance, 0) drag_distance,
+           po.date_connecting,
+           po.date_arrive,
+           po.date_finished,
+           ri.salvation_person_name,
+           ri.salvation_person_telno
+        from rescueowner.rs_insaic_order o
+        left join rescueowner.rs_owner_order ow
+           on o.insaic_order_no = ow.insaic_order_no
+        left join rescueowner.rs_order_acci_info ac
+           on o.insaic_order_no = ac.insaic_order_no
+        left join rescueowner.rs_provider_order po
+           on o.insaic_order_no = po.insaic_order_no
+        left join rescueowner.rs_order_rescuer_info ri
+           on o.insaic_order_no = ri.insaic_order_no
+        where o.insaic_order_no in (:insaicOrderNoList)
+        ]]>
+    </sql-query>
+
+</dynamic-query>
