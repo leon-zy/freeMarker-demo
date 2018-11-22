@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <diskStore path="ehcacheDir"/>
+    <cache name="RescueEhCache" maxElementsInMemory="1000"
+           eternal="true" overflowToDisk="false" memoryStoreEvictionPolicy="LRU" diskPersistent="false"
+           diskExpiryThreadIntervalSeconds="1200" diskSpoolBufferSizeMB="30"
+           maxElementsOnDisk="1000">
+    </cache>
+    <cache name="CommonEhCache" maxElementsInMemory="1000"
+           eternal="true" overflowToDisk="false" memoryStoreEvictionPolicy="LRU" diskPersistent="false"
+           diskExpiryThreadIntervalSeconds="1200" diskSpoolBufferSizeMB="30"
+           maxElementsOnDisk="1000">
+    </cache>
+    <cache name="DynamicQueryEhCache" maxElementsInMemory="1000"
+           eternal="true" overflowToDisk="false" memoryStoreEvictionPolicy="LRU" diskPersistent="false"
+           diskExpiryThreadIntervalSeconds="1200" diskSpoolBufferSizeMB="30"
+           maxElementsOnDisk="1000">
+    </cache>
+</ehcache>

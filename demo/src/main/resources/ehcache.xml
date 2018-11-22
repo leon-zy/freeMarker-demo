@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"
+       default-lazy-init="true">
+    <!-- ehcache 缓存配置信息-->
+    <bean id="cacheFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:/ehcacheConfig.xml"></property>
+    </bean>
+    <bean id="rescueEhCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+        <property name="cacheManager" ref="cacheFactory"/>
+        <property name="cacheName" value="rescueEhCache"/>
+    </bean>
+    <bean id="commonEhCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+        <property name="cacheManager" ref="cacheFactory"/>
+        <property name="cacheName" value="commonEhCache"/>
+    </bean>
+    <bean id="dynamicQueryEhCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+        <property name="cacheManager" ref="cacheFactory"/>
+        <property name="cacheName" value="commonEhCache"/>
+    </bean>
+
+</beans>

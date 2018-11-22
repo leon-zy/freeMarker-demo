@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd"
+       default-lazy-init="true">
+
+	<bean id="freemarkerConfiguration" class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+		<property name="freemarkerVariables">
+			<map>
+				<entry key="validFlagYes">
+					<util:constant static-field="com.insaic.common.constants.CodeConstants.YES_STR"/>
+				</entry>
+				<entry key="validFlagNo">
+					<util:constant static-field="com.insaic.common.constants.CodeConstants.NO_STR"/>
+				</entry>
+				<entry key="validFlag">
+					<util:constant static-field="com.insaic.common.constants.CodeConstants.VALID"/>
+				</entry>
+			</map>
+		</property>
+		<property name="templateLoaderPath" value="classpath:/template/ftl/"/>
+		<property name="preferFileSystemAccess" value="false"/>
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="template_exception_handler">rethrow</prop>
+				<!-- ignore,debug,html_debug,rethrow -->
+				<prop key="default_encoding">UTF-8</prop>
+				<prop key="output_encoding">UTF-8</prop>
+				<prop key="locale">zh_CN</prop>
+				<prop key="date_format">yyyy-MM-dd</prop>
+				<prop key="time_format">HH:mm:ss</prop>
+				<prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+				<!-- 可以满足一般需要。默认情况变量为null则替换为空字符串，如果需要自定义，写上${empty!"EmptyValue of fbysss"}的形式即可  -->
+				<prop key="classic_compatible">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="dynamicQueryBuilder" class="com.insaic.rescue.framework.DynamicQueryBuilderImpl"
+		  init-method="initialize" destroy-method="destroy">
+		<property name="freemarkerConfiguration" ref="freemarkerConfiguration"/>
+		<property name="configLocations">
+			<list>
+				<value>classpath:/query/*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>
