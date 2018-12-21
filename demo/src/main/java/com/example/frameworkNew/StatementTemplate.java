@@ -1,4 +1,4 @@
-package com.example.frameworkOne;
+package com.example.frameworkNew;
 
 
 import freemarker.template.Template;

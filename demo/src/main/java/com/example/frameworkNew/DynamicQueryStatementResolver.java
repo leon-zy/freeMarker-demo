@@ -1,4 +1,4 @@
-package com.example.frameworkOne;
+package com.example.frameworkNew;
 
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;

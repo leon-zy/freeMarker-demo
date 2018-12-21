@@ -1,23 +1,24 @@
-package com.example.frameworkOne;
+package com.example.frameworkNew;
 
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
+import com.example.utils.Collections3;
+import com.example.utils.CommonDataUtils;
+import com.example.utils.DataSecretUtils;
+import com.example.utils.QueryPageResultUtils;
 import com.google.common.collect.Sets;
 import com.insaic.base.dao.jpa.BaseHibernate4Dao;
 import com.insaic.base.exception.BusinessException;
 import com.insaic.base.exception.SystemException;
-import com.insaic.base.utils.Collections3;
 import com.insaic.base.utils.DateUtil;
 import com.insaic.base.utils.Reflections;
-import com.insaic.base.utils.StringUtil;
 import com.insaic.base.web.mo.WebPageResult;
 import com.insaic.common.code.model.PageParamMO;
+import com.insaic.common.constants.CodeConstants;
 import com.insaic.common.constants.CodeMsgConstants;
-import com.insaic.common.util.CommonDataUtils;
-import com.insaic.common.util.QueryPageResultUtils;
 import com.insaic.rescue.annotation.NamedQueryData;
 import com.insaic.rescue.constants.RescueConstants;
-import com.insaic.rescue.utils.DataSecretUtils;
+import freemarker.template.utility.StringUtil;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -46,12 +47,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * BaseDAOHibernateImpl
+ * BaseDynamicQueryDaoPlus
  * Created by leon_zy on 2018/11/16
  */
 @Repository
-public class BaseHibernate4DaoPlus<E extends Serializable> extends BaseHibernate4Dao<E> {
-    private static final Logger logger = LoggerFactory.getLogger(BaseHibernate4DaoPlus.class);
+public class BaseDynamicQueryDaoPlus<E extends Serializable> extends BaseHibernate4Dao<E> {
+    private static final Logger logger = LoggerFactory.getLogger(BaseDynamicQueryDaoPlus.class);
     @PersistenceContext
     private EntityManager em;
     private static SessionFactory sf;
@@ -147,21 +148,16 @@ public class BaseHibernate4DaoPlus<E extends Serializable> extends BaseHibernate
         Map<String, Object> result = new HashMap<>();
         NamedQueryData annotation = null;
         Class<?> parentClass = Class.forName(className);
-        Method method;
-        Class<?>[] c = null;
-        if(null != params){//存在
-            int len = params.length;
-            c = new Class[len];
-            for (int i = 0; i < len; ++i) {
-                c[i] = params[i].getClass();
+        Method method = null;
+        Method[] methods = parentClass.isInterface() ? parentClass.getMethods() : parentClass.getDeclaredMethods();
+        for (Method item : methods) {
+            if (methodName.equals(item.getName()) && params.length == item.getParameterTypes().length) {
+                method = item;
+                break;
             }
         }
-        if(null != c && c.length == 1){
-            String clazzName = c[0].getSimpleName();
-            Class<?> parameterType = ARRAY_LIST.equals(clazzName) ? List.class : HASH_SET.equals(clazzName) ? Set.class : c[0];
-            method = parentClass.getDeclaredMethod(methodName, parameterType);
-        }else{
-            method = parentClass.getDeclaredMethod(methodName, c);
+        if(null == method){
+            throw new BusinessException(className + CodeConstants.DOT_EN + methodName + "方法不存在！");
         }
         // 获取该方法的注解实例
         if (method.isAnnotationPresent(NamedQueryData.class)) {
@@ -182,15 +178,17 @@ public class BaseHibernate4DaoPlus<E extends Serializable> extends BaseHibernate
         if(null != params){
             String className;
             for(int i = 0; i < params.length; ++i){
-                className = params[i].getClass().getSimpleName();
-                if (DataSecretUtils.validFieldBaseFlag(params[i])
-                        || ARRAY_LIST.equals(className) || HASH_SET.equals(className)) {
-                    parametersMap.put(parameters[i], params[i]);
-                }else{
-                    for (Field field : Reflections.getAllFields(params[i].getClass())) {
-                        field.setAccessible(true);
-                        if(!serialVersionUID.equals(field.getName())){
-                            parametersMap.put(field.getName(), field.get(params[i]));
+                if(null != params[i]){
+                    className = params[i].getClass().getSimpleName();
+                    if (DataSecretUtils.validFieldBaseFlag(params[i])
+                            || ARRAY_LIST.equals(className) || HASH_SET.equals(className)) {
+                        parametersMap.put(parameters[i], params[i]);
+                    }else{
+                        for (Field field : Reflections.getAllFields(params[i].getClass())) {
+                            field.setAccessible(true);
+                            if(!serialVersionUID.equals(field.getName())){
+                                parametersMap.put(field.getName(), field.get(params[i]));
+                            }
                         }
                     }
                 }
@@ -241,7 +239,7 @@ public class BaseHibernate4DaoPlus<E extends Serializable> extends BaseHibernate
             }
             result = (T)coll;
         }else{
-            result = (T)CommonDataUtils.getDataResultList(dataMaps, clazzEntry);
+            result = (T) CommonDataUtils.getDataResultList(dataMaps, clazzEntry);
         }
         return result;
     }

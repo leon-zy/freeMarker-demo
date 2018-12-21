@@ -1,9 +1,9 @@
-package com.example.frameworkOne;
+package com.example.frameworkNew;
 
-import com.insaic.base.utils.StringUtil;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.utility.StringUtil;
 import org.apache.commons.lang3.Validate;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -55,7 +55,7 @@ public class DynamicQueryBuilderImpl implements DynamicQueryBuilder, ResourceLoa
     //查询语句名称缓存，不允许重复
     private Set<String> nameCache = new HashSet<String>();
     //模板缓存
-    private static Map<String, StatementTemplate> templateCache;
+    private static Map<String, StatementTemplate> templateCache = new HashMap<>();;
 
     @Override public Map<String, StatementTemplate> loadAllMateDataMap() {
         return templateCache;
@@ -250,17 +250,14 @@ public class DynamicQueryBuilderImpl implements DynamicQueryBuilder, ResourceLoa
     }
 
     private void afterPropertiesSet(Map<String,String> namedHQLQueries, Map<String,String> namedSQLQueries) throws Exception {
-        if(null == templateCache || templateCache.isEmpty()){
-            if(null == this.freemarkerConfiguration){
-                this.freemarkerConfiguration = new Configuration();
-            }
-            templateCache = new HashMap<>();
-            this.freemarkerConfiguration.setNumberFormat("#");
-            StringTemplateLoader stringLoader = new StringTemplateLoader();
-            this.freemarkerConfiguration.setTemplateLoader(stringLoader);
-            this.handlerStatementTemplate(stringLoader, namedHQLQueries, StatementTemplate.TYPE.HQL);
-            this.handlerStatementTemplate(stringLoader, namedSQLQueries, StatementTemplate.TYPE.SQL);
+        if(null == this.freemarkerConfiguration){
+            this.freemarkerConfiguration = new Configuration();
         }
+        this.freemarkerConfiguration.setNumberFormat("#");
+        StringTemplateLoader stringLoader = new StringTemplateLoader();
+        this.freemarkerConfiguration.setTemplateLoader(stringLoader);
+        this.handlerStatementTemplate(stringLoader, namedHQLQueries, StatementTemplate.TYPE.HQL);
+        this.handlerStatementTemplate(stringLoader, namedSQLQueries, StatementTemplate.TYPE.SQL);
     }
 
     private void handlerStatementTemplate(StringTemplateLoader stringLoader, Map<String,String> namedQueries, StatementTemplate.TYPE type) throws IOException {
